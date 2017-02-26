@@ -1,0 +1,17 @@
+{
+  "name": "Web of Life",
+  "description": "Takes your boring webpage and turns it to life!",
+  "version": "0.0.0.1",
+  "manifest_version": 2,
+  "icons": { 
+    "16": "icon16.png"
+  },
+  "app": {
+    "urls": [
+      "http://www.noahs.com"
+    ],
+    "launch": {
+      "web_url": "http://www.noahs.com"
+    }
+  }
+}
