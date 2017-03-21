@@ -10,10 +10,9 @@ class Cell {
 
 	drawCell(canvas) {
 		let context = canvas.getContext("2d");
-
 		// x line
 		context.moveTo(this.getCoordinate().x, this.getCoordinate().y);
-		context.fillText(this.x, this.getCoordinate().x, this.getCoordinate().y);
+		//context.fillText(this.x, this.getCoordinate().x, this.getCoordinate().y);
 	    context.lineTo(this.getCoordinate().x + 50, this.getCoordinate().y);
 	    context.moveTo(this.getCoordinate().x, this.getCoordinate().y);
 	    context.lineTo(this.getCoordinate().x, this.getCoordinate().y + 50);
@@ -23,8 +22,15 @@ class Cell {
 	}
 
 	isAlive(canvas) {
-		
-		return true;
+		let context = canvas.getContext("2d");
+		let imageData = context.getImageData(this.getCoordinate().x, this.getCoordinate().y, this.getCoordinate().x + 50, this.getCoordinate().y + 50);
+		//let aliveArray = [];
+		let aliveArray = [];
+		for (let i = 0; i < 2500; i = i + 25) {
+			aliveArray.push(imageData.data.slice(i, i+4));
+		}
+		debugger;
+		//aliveArray.push(Math.floor((Math.random() * 10) + 1));
 	}
 }
 
@@ -57,6 +63,7 @@ const createSS = function(event) {
 				let cell = new Cell(x, y);
 				cell.drawCell(canvas);
 				cells.push(cell);
+				cell.isAlive(canvas);
 			}
 		}
 	    console.log("drawing grid");
