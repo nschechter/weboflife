@@ -18,12 +18,13 @@ class Cell {
 	    context.moveTo(this.getCoordinate().x, this.getCoordinate().y);
 	    context.lineTo(this.getCoordinate().x, this.getCoordinate().y + 50);
 
-	    // y line
-	    //context.moveTo(0, 0.5 + this.getCoordinate().y);
-		//context.lineTo(this.getCoordinate().y, 0.5 + this.getCoordinate().y);
-
 	    context.strokeStyle = "black";
 	    context.stroke();
+	}
+
+	isAlive(canvas) {
+		
+		return true;
 	}
 }
 
@@ -33,24 +34,12 @@ const createSS = function(event) {
 	console.log("LOADED");
 	html2canvas(document.body, {
 		onrendered: function(canvas) {
-			// canvas.width = document.documentElement.clientWidth;
-			// canvas.height = document.documentElement.clientHeight;
-			// document.body.appendChild(canvas);
 			createGrid(greyScale(canvas));
 		}
 	});
 };
 
-const getImageData = function (canvas) {
-	var context = canvas.getContext("2d");
-	var width = canvas.width;
-	var height = canvas.height;
-	var imageData = context.getImageData(0, 0, width, height);
-	return imageData;
-}
-
 	const createGrid = function(canvas) {
-        //document.body.appendChild(canvas);
 		//grid width and height
 		var bw = canvas.width;
 		var bh = canvas.height;
@@ -63,29 +52,6 @@ const getImageData = function (canvas) {
 		var context = canvas.getContext("2d");
 		//(bw / 50) * (bh / 50)
 
-		// rendering a line from 0 to canvas width
-		// for (let x = 0; x <= bw; x += 50) {
-	        // context.moveTo(0.5 + x + p, p);
-	        // context.lineTo(0.5 + x + p, bh + p);
-		// }
-
-		// rendering a line from 0 to canvas height
-		// increment 50 each time
-		// for (let y = 0; y <= bh; y += 50) {
-		    // context.moveTo(p, 0.5 + y + p);
-		    // context.lineTo(bw + p, 0.5 + y + p);
-		// }
-
-		// for (let i = 0; i < ((bw / 50) * (bh / 50)); i++) {
-		// 	// x
-		// 	context.moveTo(0.5 + x + p, p);
-	 //        context.lineTo(0.5 + x + p, bh + p);
-
-	 //        // y
-		// 	context.moveTo(p, 0.5 + y + p);
-		//     context.lineTo(bw + p, 0.5 + y + p);
-		// }
-
 		for (let x = 0; x < bw; x += 50) {
 			for (let y = 0; y < bh; y += 50) {
 				let cell = new Cell(x, y);
@@ -97,6 +63,15 @@ const getImageData = function (canvas) {
 		document.body.innerHTML = "";
 		document.body.appendChild(canvas);
     }
+
+    // need to know what this is
+	const getImageData = function(canvas) {
+		var context = canvas.getContext("2d");
+		var width = canvas.width;
+		var height = canvas.height;
+		var imageData = context.getImageData(0, 0, width, height);
+		return imageData;
+	}
 
     const greyScale = function(canvas) {
     	var context = canvas.getContext("2d");
