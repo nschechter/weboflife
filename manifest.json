@@ -1,17 +1,21 @@
 {
-  "name": "Web of Life",
-  "description": "Takes your boring webpage and turns it to life!",
-  "version": "0.0.0.1",
-  "manifest_version": 2,
-  "icons": { 
-    "16": "icon16.png"
-  },
-  "app": {
-    "urls": [
-      "http://www.noahs.com"
-    ],
-    "launch": {
-      "web_url": "http://www.noahs.com"
+  "name": "Web Of Life",
+  "description": "Creates Conway's Game of Life!",
+  "version": "0.1",
+  "content_scripts": [
+    {
+     "run_at": "document_end",
+     "js": ["content.js", "html2canvas.js"],
+     "matches": ["http://*/*", "https://*/*"]
     }
-  }
+  ],
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "browser_action": {
+    "default_popup": "./popup/popup.html",
+    "default_title": "yeah dude"
+  },
+  "manifest_version": 2
 }
