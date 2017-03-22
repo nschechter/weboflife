@@ -5,12 +5,16 @@
  const CELL_HEIGHT = 50;
 
  var cells = [];
+ var canvas;
 
  class Cell {
- 	constructor(x, y, alive) {
+ 	constructor(x, y) {
  		this.x = x;
  		this.y = y;
  		this.alive = false;
+ 		this.neighbors = [];
+ 		// maybe canvas instead
+ 		this.imageData = null;
  	}
 
  	getCoordinate() {
@@ -19,7 +23,6 @@
 
  	drawCell(canvas) {
  		let context = canvas.getContext("2d");
- 		//context.fillText(this.x, this.getCoordinate().x, this.getCoordinate().y);
 		context.moveTo(this.getCoordinate().x, this.getCoordinate().y);
 		context.lineTo(this.getCoordinate().x + 50, this.getCoordinate().y);
 		context.moveTo(this.getCoordinate().x, this.getCoordinate().y);
@@ -29,63 +32,100 @@
 		context.stroke();
 	}
 
-	isAlive(canvas) {
+	drawState(canvas) {
+		let context = canvas.getContext("2d");
+		context.fillText(this.isAlive(), this.getCoordinate().x, this.getCoordinate().y);
+		context.stroke();
+	}
+
+	setCanvasAndState(canvas) {
 		let context = canvas.getContext("2d");
 		let imageData = context.getImageData(this.getCoordinate().x, this.getCoordinate().y, 50, 50);
 		//let aliveArray = [];
 		let aliveArraySample = [];
-		for (let i = 0; i < (CELL_HEIGHT * CELL_WIDTH); i += 25) {
+		for (let i = 0; i < (CELL_HEIGHT * CELL_WIDTH); i ++) {
 			aliveArraySample.push(imageData.data.slice(i, i+4));
 		}
-		if (getMajorityColor(aliveArraySample) == "white") {
-			return false;
-			this.alive = false;
-		} else {
-			return true;
+		if (getMajorityColor(aliveArraySample) == "black") {
 			this.alive = true;
+		} else {
+			this.alive = false;
 		}
+		this.imageData = imageData;
+	}
+
+	isAlive() {
+		return this.alive;
+	}
+
+	addNeighbor(neighbor) {
+		if (neighbor != undefined)
+			this.neighbors.push(neighbor);
 	}
 
 	getNeighbors() {
-		temp = [];
-
-		return 
+		return this.neighbors.filter((n) => n.isAlive());
 	}
-}
 
-const destroyCell = (cell) => {
+	setImageData(data) {
+		let context = canvas.getContext("2d");
+		context.putImageData(data, this.x, this.y);
+	}
 }
 
 const getCellAtCoordinate = (x, y) => {
 	let tempCell = undefined;
-	cells.forEach((cell) => {
+	for (let cell of cells) {
 		if (cell.getCoordinate().x === x && cell.getCoordinate().y === y) {
 			tempCell = cell;
 			break;
 		}
-	})
+	}
+	// cells.forEach((cell) => {
+	// 	if (cell.getCoordinate().x === x && cell.getCoordinate().y === y) {
+	// 		tempCell = cell;
+	// 		break;
+	// 	}
+	// })
 	return tempCell;
 }
 
+// to do more with accuracy
 const getMajorityColor = (arr) => {
 	let b = 0;
 	let w = 0;
 	arr.forEach((element) => {
-		if (element[0] == 255)
-			b++;
+		if (element[0] > 235 && element[1] > 235 && element[2] > 235)
+			w++; // dead
 		else
-			w++;
+			b++; // alive
 	});
-	return w > b ? "white" : "black"
+	return b > w ? "black" : "white"
+}
+
+const destroyCell = (cell) => {
+	cell.alive = false;
+	let data = cell.imageData;
+	data[3] = 0;
+	cell.setImageData(data);
+}
+
+const getRandomImageDataFromNeighbor = (cell) => {
+	cell.alive = true;
+	neighbors = cell.getNeighbors();
+	let randomNeighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
+	cell.setImageData(randomNeighbor.imageData);
 }
 
 const calculateCellMove = (cell) => {
+	let neighbors = cell.getNeighbors();
 	if (cell.isAlive()) {
-		let neighbors = getNeighbors();
-		if (cell.neighbors.length > 3) {
-
-		} else if (cell.neighbors.length <= 1) {
-			destroyCell(cell);
+		if (neighbors.length >= 4 || neighbors.length <= 1) {
+			destroyCell(cell)
+		}
+	} else {
+		if (neighbors.length == 3) {
+			getRandomImageDataFromNeighbor(cell);
 		}
 	}
 }
@@ -94,7 +134,7 @@ const runGame = () => {
 	setInterval(() => {
 		step();
 		console.log("stepping");
-	}, 3000);
+	}, 50);
 }
 
 const step = () => {
@@ -106,8 +146,9 @@ const step = () => {
 const createSS = (event) => {
 	console.log("LOADED");
 	html2canvas(document.body, {
-		onrendered: function(canvas) {
-			createGrid(greyScale(canvas));
+		onrendered: function(c) {
+			canvas = c;
+			createGrid(canvas);
 			runGame();
 		}
 	});
@@ -132,12 +173,30 @@ const createGrid = (canvas) => {
 		for (let x = 0; x < bw; x += CELL_WIDTH) {
 			for (let y = 0; y < bh; y += CELL_HEIGHT) {
 				let cell = new Cell(x, y);
-				cell.drawCell(canvas);
+				//cell.drawCell(canvas);
 				cells.push(cell);
-				cell.isAlive(canvas);
 			}
 		}
-		console.log("...loaded cells");
+
+		console.log("...created cells");
+
+		// add surrounding neighbors
+		for (let x = 0; x < bw; x += CELL_WIDTH) {
+			for (let y = 0; y < bh; y += CELL_HEIGHT) {
+				let cell = getCellAtCoordinate(x, y);
+				cell.addNeighbor(getCellAtCoordinate(x-50, y-50))
+				cell.addNeighbor(getCellAtCoordinate(x-50, y))
+				cell.addNeighbor(getCellAtCoordinate(x, y-50))
+				cell.addNeighbor(getCellAtCoordinate(x, y+50))
+				cell.addNeighbor(getCellAtCoordinate(x+50, y))
+				cell.addNeighbor(getCellAtCoordinate(x+50, y+50))
+				cell.addNeighbor(getCellAtCoordinate(x+50, y-50))
+				cell.addNeighbor(getCellAtCoordinate(x-50, y+50))
+				cell.setCanvasAndState(canvas);
+				cell.drawState(canvas);
+			}
+		}
+		console.log("...added neighbors to cells");
 		document.body.innerHTML = "";
 		document.body.appendChild(canvas);
 	};
@@ -160,25 +219,25 @@ const getImageData = (canvas) => {
     	for(var i = 0; i < data.length; i += 4) {
     		var brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
           // red
-          if (data[i] > 245) {
+          if (data[i] >= 225) {
           	data[i] = 255;
-          } else if (data[i] < 10) {
+          } else if (data[i] < 225) {
           	data[i] = 0;
           } else {
           	data[i] = brightness;
           }
           // green
-          if (data[i+1] > 245) {
+          if (data[i+1] >= 225) {
           	data[i+1] = 255;
-          } else if (data[i+1] < 10) {
+          } else if (data[i+1] < 225) {
           	data[i+1] = 0;
           } else {
           	data[i+1] = brightness;
           }
           // blue
-          if (data[i+2] > 245) {
+          if (data[i+2] >= 225) {
           	data[i+2] = 255;
-          } else if (data[i+2] < 10) {
+          } else if (data[i+2] < 225) {
           	data[i+2] = 0;
           } else {
           	data[i+2] = brightness;
