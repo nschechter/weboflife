@@ -1,21 +1,23 @@
 {
   "name": "Web Of Life",
   "description": "Creates Conway's Game of Life!",
-  "version": "0.1",
+  "version": "0.2",
   "content_scripts": [
     {
-     "run_at": "document_end",
-     "js": ["content.js", "html2canvas.js"],
+     "js": ["html2canvas.js"],
      "matches": ["http://*/*", "https://*/*"]
     }
   ],
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "tabs",
+    "http://*/*",
+    "https://*/*"
   ],
   "browser_action": {
     "default_popup": "./popup/popup.html",
-    "default_title": "yeah dude"
+    "default_title": "Web of Life"
   },
   "manifest_version": 2
 }
