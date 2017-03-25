@@ -5,10 +5,11 @@
  const CELL_HEIGHT = 50;
  const TICK_RATE = 50; // in ms
 
- var cells = [];
+ var cells;
  var canvas;
- var statusCanvas = document.createElement("canvas");
- var status = "Preparing...";
+ var status;
+ var oldHTML;
+ var game;
 
  // Cell class
  class Cell {
@@ -78,13 +79,13 @@
 
 // WIP
 const updateStatus = (text) => {
-	status = text;
-	let context = statusCanvas.getContext("2d");
-	statusCanvas.width = 100;
-    statusCanvas.height = 100;
-	context.clearRect(100, 100, 100, 100);
-	context.font = "30px Arial";
-	context.fillText(status, 100, 100);
+	var statusElement = document.getElementById("status");
+	statusElement.innerHTML = text;
+}
+
+// needs refactoring
+const getCurrentlyAliveCells = () => {
+	return cells.filter(cell => cell.isAlive()).length;
 }
 
 // needs refactoring
@@ -144,9 +145,15 @@ const calculateCellMove = (cell) => {
 
 // run game ticks
 const runGame = () => {
-	setInterval(() => {
+	game = setInterval(() => {
 		step();
-		status = "Running";
+		cellCount = getCurrentlyAliveCells();
+		status = `
+			Running...
+			Alive: ${cellCount}
+			Dead: ${cells.length - cellCount}
+			Total: ${cells.length}
+		`;
 		updateStatus(status);
 		console.log("stepping");
 	}, TICK_RATE);
@@ -159,10 +166,39 @@ const step = () => {
 	});
 }
 
+const restorePage = (event) => {
+	event.preventDefault();
+	clearInterval(game);
+	document.body.innerHTML = oldHTML;
+}
+
+const createStatusBox = () => {
+	let statusBox = document.createElement("div");
+	statusBox.setAttribute("id", "status-nav");
+	statusBox.setAttribute("style", "position: absolute; z-index: 1; left: 50px; top: 50px; width:200px; height:400px; opacity: 0.7;");
+	document.body.appendChild(statusBox);
+
+	let status = document.createElement("div");
+	status.setAttribute("id", "status")
+	document.getElementById("status-nav").appendChild(status);
+
+	let restore = document.createElement("input");
+	restore.type = "submit";
+	restore.value = "Restore Page";
+	restore.onclick = restorePage;
+	document.getElementById("status-nav").appendChild(restore);
+}
+
 // create canvas and start the game
 const createSS = (event) => {
+	canvas = undefined;
+	cells = [];
+	status = "Preparing..."
+	game = undefined;
+
 	console.log("LOADED");
 	html2canvas(document.body, {
+		// allowTaint: true,
 		onrendered: function(c) {
 			canvas = c;
 			createGrid(canvas);
@@ -174,6 +210,10 @@ const createSS = (event) => {
 // creates grid
 const createGrid = (canvas) => {
 		console.log("...drawing grid");
+		oldHTML = document.body.innerHTML;
+		document.body.innerHTML = "";
+		document.body.appendChild(canvas);
+		createStatusBox();
 		updateStatus("Drawing Grid...");
 		let bw = canvas.width;
 		let bh = canvas.height;
@@ -183,28 +223,28 @@ const createGrid = (canvas) => {
 		for (let x = 0; x <= bw; x += 50) {
 			context.moveTo(x, 0);
 			context.lineTo(x, bh);
+			context.stroke();
 		}
 
 		for (let y = 0; y <= bh; y += 50) {
 			context.moveTo(0, y);
 			context.lineTo(bw, y);
+			context.stroke();
 		}
 
-		context.stroke();
-
 		console.log("...done drawing grid");
-		//updateStatus("Creating Cells...");
+		updateStatus("Creating Cells...");
 
 		for (let x = 0; x < bw; x += CELL_WIDTH) {
 			for (let y = 0; y < bh; y += CELL_HEIGHT) {
 				let cell = new Cell(x, y);
-				//cell.drawCell(canvas);
+				//cell.drawingCell(canvas);
 				cells.push(cell);
 			}
 		}
 
 		console.log("...created cells");
-		//updateStatus("Creating Neighbors...")
+		updateStatus("Creating Neighbors...")
 
 		// add surrounding neighbors
 		for (let x = 0; x < bw; x += CELL_WIDTH) {
@@ -226,61 +266,59 @@ const createGrid = (canvas) => {
 		console.log("...added neighbors to cells");
 
 		// wipe body html and replace it with the canvas
-		document.body.innerHTML = "";
-		document.body.appendChild(canvas);
  };
 
 /*                                                                *
  * ====================Possible Greyscaling?===================== *
  *                             (WIP)                              */
 
-const getImageData = (canvas) => {
-	var context = canvas.getContext("2d");
-	var width = canvas.width;
-	var height = canvas.height;
-	var imageData = context.getImageData(0, 0, width, height);
-	return imageData;
-};
+// const getImageData = (canvas) => {
+// 	var context = canvas.getContext("2d");
+// 	var width = canvas.width;
+// 	var height = canvas.height;
+// 	var imageData = context.getImageData(0, 0, width, height);
+// 	return imageData;
+// };
 
-const greyScale = (canvas) => {
-	var context = canvas.getContext("2d");
-	var imageData = getImageData(canvas);
-	var data = imageData.data;
+// const greyScale = (canvas) => {
+// 	var context = canvas.getContext("2d");
+// 	var imageData = getImageData(canvas);
+// 	var data = imageData.data;
 
-	console.log("...greyscaling");
-	for(var i = 0; i < data.length; i += 4) {
-		var brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
-          // red
-          if (data[i] >= 225) {
-          	data[i] = 255;
-          } else if (data[i] < 225) {
-          	data[i] = 0;
-          } else {
-          	data[i] = brightness;
-          }
-          // green
-          if (data[i+1] >= 225) {
-          	data[i+1] = 255;
-          } else if (data[i+1] < 225) {
-          	data[i+1] = 0;
-          } else {
-          	data[i+1] = brightness;
-          }
-          // blue
-          if (data[i+2] >= 225) {
-          	data[i+2] = 255;
-          } else if (data[i+2] < 225) {
-          	data[i+2] = 0;
-          } else {
-          	data[i+2] = brightness;
-          }
-      }
+// 	console.log("...greyscaling");
+// 	for(var i = 0; i < data.length; i += 4) {
+// 		var brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
+//           // red
+//           if (data[i] >= 225) {
+//           	data[i] = 255;
+//           } else if (data[i] < 225) {
+//           	data[i] = 0;
+//           } else {
+//           	data[i] = brightness;
+//           }
+//           // green
+//           if (data[i+1] >= 225) {
+//           	data[i+1] = 255;
+//           } else if (data[i+1] < 225) {
+//           	data[i+1] = 0;
+//           } else {
+//           	data[i+1] = brightness;
+//           }
+//           // blue
+//           if (data[i+2] >= 225) {
+//           	data[i+2] = 255;
+//           } else if (data[i+2] < 225) {
+//           	data[i+2] = 0;
+//           } else {
+//           	data[i+2] = brightness;
+//           }
+//       }
 
-        // overwrite original image
-        context.putImageData(imageData, 1, 1);
-        console.log("...loaded greyscale");
-        return canvas;
-    };
+//         // overwrite original image
+//         context.putImageData(imageData, 1, 1);
+//         console.log("...loaded greyscale");
+//         return canvas;
+//     };
 
 // run function on execution of script
 createSS();

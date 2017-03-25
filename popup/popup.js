@@ -4,6 +4,9 @@ window.onload = function() {
 
 const createLife = function(event) {
 	event.preventDefault()
-	//console.log(document.getElementsByTagName("input")[0].value)
 	chrome.tabs.executeScript(null, {file: "content.js"});
 };
+
+const restorePage = function(event) {
+	event.preventDefault();
+}
