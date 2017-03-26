@@ -1,7 +1,7 @@
 {
   "name": "Web Of Life",
   "description": "Creates Conway's Game of Life!",
-  "version": "0.2",
+  "version": "0.3",
   "content_scripts": [
     {
      "js": ["html2canvas.js"],

@@ -5,6 +5,8 @@
  const CELL_HEIGHT = 50;
  const TICK_RATE = 50; // in ms
 
+
+ var alive_count = 0;
  var cells;
  var canvas;
  var status;
@@ -25,7 +27,7 @@
  		return { x: this.x, y: this.y }
  	}
 
- 	drawCell(canvas) {
+ 	drawCell() {
  		let context = canvas.getContext("2d");
  		context.moveTo(this.getCoordinate().x, this.getCoordinate().y);
  		context.lineTo(this.getCoordinate().x + 50, this.getCoordinate().y);
@@ -36,13 +38,13 @@
  		context.stroke();
  	}
 
- 	drawState(canvas) {
+ 	drawState() {
  		let context = canvas.getContext("2d");
  		context.fillText(this.isAlive(), this.getCoordinate().x, this.getCoordinate().y);
  		context.stroke();
  	}
 
- 	setCanvasAndState(canvas) {
+ 	setState() {
  		let context = canvas.getContext("2d");
  		let imageData = context.getImageData(this.getCoordinate().x, this.getCoordinate().y, 50, 50);
 		//let aliveArray = [];
@@ -52,6 +54,7 @@
 		}
 		if (getMajorityColor(aliveArraySample) == "black") {
 			this.alive = true;
+			alive_count++;
 		} else {
 			this.alive = false;
 		}
@@ -84,11 +87,6 @@ const updateStatus = (text) => {
 }
 
 // needs refactoring
-const getCurrentlyAliveCells = () => {
-	return cells.filter(cell => cell.isAlive()).length;
-}
-
-// needs refactoring
 const getCellAtCoordinate = (x, y) => {
 	let tempCell = undefined;
 	for (let cell of cells) {
@@ -114,11 +112,13 @@ const getMajorityColor = (arr) => {
 }
 
 // destroys a cell by setting alive to false and setting opacity to 0.
+// WIP
 const destroyCell = (cell) => {
-	cell.alive = false;
 	let data = cell.imageData;
 	data[3] = 0;
 	cell.setImageData(data);
+	cell.alive = false;
+	alive_count--;
 }
 
 // assign random image data from a neighbor to the cell specified
@@ -127,6 +127,7 @@ const getRandomImageDataFromNeighbor = (cell) => {
 	neighbors = cell.getNeighbors();
 	let randomNeighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
 	cell.setImageData(randomNeighbor.imageData);
+	alive_count++;
 }
 
 // actual conways game of life rules
@@ -134,7 +135,7 @@ const calculateCellMove = (cell) => {
 	let neighbors = cell.getNeighbors();
 	if (cell.isAlive()) {
 		if (neighbors.length >= 4 || neighbors.length <= 1) {
-			destroyCell(cell)
+			destroyCell(cell);
 		}
 	} else {
 		if (neighbors.length == 3) {
@@ -147,15 +148,13 @@ const calculateCellMove = (cell) => {
 const runGame = () => {
 	game = setInterval(() => {
 		step();
-		cellCount = getCurrentlyAliveCells();
 		status = `
 			Running...
-			Alive: ${cellCount}
-			Dead: ${cells.length - cellCount}
+			Alive: ${alive_count}
+			Dead: ${cells.length - alive_count}
 			Total: ${cells.length}
 		`;
 		updateStatus(status);
-		console.log("stepping");
 	}, TICK_RATE);
 }
 
@@ -220,17 +219,17 @@ const createGrid = (canvas) => {
 
 		let context = canvas.getContext("2d");
 
-		for (let x = 0; x <= bw; x += 50) {
-			context.moveTo(x, 0);
-			context.lineTo(x, bh);
-			context.stroke();
-		}
+		// for (let x = 0; x <= bw; x += 50) {
+		// 	context.moveTo(x, 0);
+		// 	context.lineTo(x, bh);
+		// 	context.stroke();
+		// }
 
-		for (let y = 0; y <= bh; y += 50) {
-			context.moveTo(0, y);
-			context.lineTo(bw, y);
-			context.stroke();
-		}
+		// for (let y = 0; y <= bh; y += 50) {
+		// 	context.moveTo(0, y);
+		// 	context.lineTo(bw, y);
+		// 	context.stroke();
+		// }
 
 		console.log("...done drawing grid");
 		updateStatus("Creating Cells...");
@@ -238,7 +237,7 @@ const createGrid = (canvas) => {
 		for (let x = 0; x < bw; x += CELL_WIDTH) {
 			for (let y = 0; y < bh; y += CELL_HEIGHT) {
 				let cell = new Cell(x, y);
-				//cell.drawingCell(canvas);
+				cell.drawCell();
 				cells.push(cell);
 			}
 		}
@@ -258,7 +257,7 @@ const createGrid = (canvas) => {
 				cell.addNeighbor(getCellAtCoordinate(x+50, y+50))
 				cell.addNeighbor(getCellAtCoordinate(x+50, y-50))
 				cell.addNeighbor(getCellAtCoordinate(x-50, y+50))
-				cell.setCanvasAndState(canvas);
+				cell.setState();
 				//cell.drawState(canvas);
 			}
 		}
