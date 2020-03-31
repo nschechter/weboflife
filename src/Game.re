@@ -1,10 +1,3 @@
-module TupleHash =
-  Belt.Id.MakeHashable({
-    type t = (float, float);
-    let hash = point => int_of_float(fst(point) +. 31.0 *. snd(point));
-    let eq = (a, b) => fst(a) == fst(b) && snd(a) == snd(b);
-  });
-
 type aliveStates =
   | Dead
   | Alive;
