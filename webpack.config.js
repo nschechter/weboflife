@@ -1,7 +1,7 @@
 var path = require("path");
 
 module.exports = {
-  mode: "development",
+  mode: "production",
   entry: {
     content_script: "./src/App.bs.js",
     popup: "./src/popup/Index.bs.js"

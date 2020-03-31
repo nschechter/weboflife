@@ -3,16 +3,10 @@
   "version": "0.1",
   "manifest_version": 2,
   "description": "Make your webpage alive!",
-  "permissions": ["activeTab", "storage", "tabs"],
+  "permissions": ["activeTab"],
   "icons": {
     "16": "assets/icon16.png"
   },
-  "content_scripts": [
-    {
-      "js": ["dist/content_script.bundle.js"],
-      "matches": ["*://*/*"]
-    }
-  ],
   "browser_action": {
     "default_icon": "assets/icon16.png",
     "default_popup": "dist/popup.html"

@@ -19,12 +19,13 @@ let queryByTestId = (id: string, element: Dom.element) =>
   | None => raise(Failure("Element not found"))
   };
 
-afterEach(() =>
+afterEach(() => {
   switch (document->Document.unsafeAsHtmlDocument->HtmlDocument.body) {
   | Some(body) => body->setInnerHTML("")
   | None => raise(Failure("Unable to find document body"))
-  }
-);
+  };
+  Game.stopGame();
+});
 
 test("toContainCanvas", () =>
   render({|<canvas data-testid="grid"></canvas>|})
