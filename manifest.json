@@ -1,20 +1,20 @@
 {
   "name": "Web Of Life",
-  "description": "Creates Conway's Game of Life!",
-  "version": "0.3",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "Make your webpage alive!",
+  "permissions": ["activeTab", "storage", "tabs"],
+  "icons": {
+    "16": "assets/icon16.png"
+  },
   "content_scripts": [
     {
-     "js": ["html2canvas.js"],
-     "matches": ["http://*/*", "https://*/*"]
+      "js": ["dist/content_script.bundle.js"],
+      "matches": ["*://*/*"]
     }
   ],
-  "permissions": [
-    "activeTab",
-    "storage"
-  ],
   "browser_action": {
-    "default_popup": "./popup/popup.html",
-    "default_title": "Web of Life"
-  },
-  "manifest_version": 2
+    "default_icon": "assets/icon16.png",
+    "default_popup": "dist/popup.html"
+  }
 }

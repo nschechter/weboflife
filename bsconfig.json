@@ -1,0 +1,26 @@
+{
+  "name": "weboflife",
+  "version": "0.1.0",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "tests",
+      "type": "dev"
+    }
+  ],
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": ["bs-webapi", "reason-react"],
+  "bs-dev-dependencies": ["@glennsl/bs-jest", "bs-jest-dom"],
+  "warnings": {
+    "error": "+101"
+  },
+  "reason": { "react-jsx": 3 },
+  "refmt": 3
+}

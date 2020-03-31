@@ -1,0 +1,30 @@
+{
+  "name": "weboflife",
+  "version": "0.0.1",
+  "description": "Web of Life in your Chrome Browser!",
+  "repository": "git@github.com:nschechter/weboflife.git",
+  "author": "Noah Schechter <noahschechter7@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn bsb -make-world && webpack --config webpack.config.js",
+    "build:watch": "yarn bsb -make-world -w",
+    "test": "yarn jest"
+  },
+  "dependencies": {
+    "html2canvas": "^1.0.0-rc.5",
+    "reason-react": "0.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-react": "^7.9.4",
+    "@glennsl/bs-jest": "^0.5.0",
+    "babel-loader": "^8.1.0",
+    "bs-jest-dom": "^2.0.1",
+    "bs-platform": "^7.2.2",
+    "bs-webapi": "^0.15.9",
+    "jest": "^25.1.0",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
