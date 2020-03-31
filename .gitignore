@@ -28,3 +28,5 @@ lib/bs
 .bsb.lock
 node_modules
 dist/*.js
+extension.zip
+*.log

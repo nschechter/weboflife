@@ -14,6 +14,8 @@ type gameConfig = {
   columns: int,
 };
 
+type executeScriptOptions = {file: string};
+
 type message =
   | StartGame(gameConfig)
   | StopGame;
@@ -27,3 +29,8 @@ external sendMessage: (int, message) => unit = "chrome.tabs.sendMessage";
 
 [@bs.val]
 external query: (queryInfo, array(tab) => unit) => unit = "chrome.tabs.query";
+
+[@bs.val]
+external executeScript:
+  (Js.Nullable.t(int), executeScriptOptions, unit => unit) => unit =
+  "chrome.tabs.executeScript";

@@ -6,8 +6,12 @@
   "author": "Noah Schechter <noahschechter7@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn bsb -make-world && webpack --config webpack.config.js",
+    "build": "yarn bsb -make-world && webpack --config webpack.config.js --mode=development",
     "build:watch": "yarn bsb -make-world -w",
+    "build:prod": "yarn bsb -make-world && webpack --config webpack.config.js",
+    "clean": "yarn bsb -clean-world",
+    "package": "yarn bestzip extension.zip dist/* assets/* manifest.json",
+    "release": "yarn clean && yarn build:prod && yarn test && yarn package",
     "test": "yarn jest"
   },
   "dependencies": {
@@ -20,6 +24,7 @@
     "@babel/preset-react": "^7.9.4",
     "@glennsl/bs-jest": "^0.5.0",
     "babel-loader": "^8.1.0",
+    "bestzip": "^2.1.5",
     "bs-jest-dom": "^2.0.1",
     "bs-platform": "^7.2.2",
     "bs-webapi": "^0.15.9",
