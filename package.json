@@ -11,7 +11,8 @@
     "build:prod": "yarn bsb -make-world && webpack --config webpack.config.js",
     "clean": "yarn bsb -clean-world",
     "package": "yarn bestzip extension.zip dist/* assets/* manifest.json",
-    "release": "yarn clean && yarn build:prod && yarn test && yarn package",
+    "prepare": "yarn clean && yarn build:prod && yarn test",
+    "release": "yarn prepare && yarn package",
     "test": "yarn jest"
   },
   "dependencies": {
