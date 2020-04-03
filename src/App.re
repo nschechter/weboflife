@@ -11,7 +11,7 @@ let startGame = (gameConfig: Chrome.gameConfig) => {
 
   HTML2Canvas.make(body, options)
   |> Js.Promise.then_(canvas => {
-       CanvasUtils.setWrapperPosition(canvas);
+       CanvasUtils.setWrapperPosition(canvasWrapper);
        Element.appendChild(canvas, canvasWrapper);
        Element.appendChild(canvasWrapper, body);
        Element.setAttribute("id", "web-of-life", canvasWrapper);
