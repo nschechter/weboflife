@@ -23,8 +23,7 @@ afterEach(() => {
   switch (document->Document.unsafeAsHtmlDocument->HtmlDocument.body) {
   | Some(body) => body->setInnerHTML("")
   | None => raise(Failure("Unable to find document body"))
-  };
-  Game.stopGame();
+  }
 });
 
 test("toContainCanvas", () =>
@@ -34,16 +33,21 @@ test("toContainCanvas", () =>
   |> JestDom.toBeVisible
 );
 
-test("isCellAlive", () =>
-  render({|<button disabled data-testid="button"></button>|})
-  |> queryByTestId("button")
+test("isCellAlive", () => {
+  CanvasHelper.createCanvasContext()
+  |> Webapi.Canvas.Canvas2d.createImageDataCoords(~width=10.0, ~height=10.0)
+  |> Webapi.Dom.Image.data
+  |> CanvasUtils.isCellAlive(~rgbTolerance=100)
   |> expect
-  |> JestDom.toBeDisabled
-);
+  |> toBe(true)
+});
 
 test("not isCellAlive", () =>
-  render({|<button disabled data-testid="button"></button>|})
-  |> queryByTestId("button")
+  CanvasHelper.createCanvasContext()
+  |> Webapi.Canvas.Canvas2d.createImageDataCoords(~width=1.0, ~height=1.0)
+  |> Webapi.Dom.Image.data
+  |> Js.Typed_array.Uint8ClampedArray.map((. _) => 50)
+  |> CanvasUtils.isCellAlive(~rgbTolerance=40)
   |> expect
-  |> JestDom.toBeDisabled
+  |> toBe(false)
 );

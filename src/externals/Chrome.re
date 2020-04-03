@@ -12,6 +12,7 @@ type gameConfig = {
   timeInterval: int,
   rows: int,
   columns: int,
+  rgbTolerance: int,
 };
 
 type executeScriptOptions = {file: string};

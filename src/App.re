@@ -12,7 +12,7 @@ let startGame = gameConfig => {
 
   HTML2Canvas.make(body, options)
   |> Js.Promise.then_(canvas => {
-       Canvas.setWrapperPosition(canvas);
+       CanvasUtils.setWrapperPosition(canvas);
        Element.appendChild(canvas, canvasWrapper);
        Element.appendChild(canvasWrapper, body);
        Element.setAttribute("id", "web-of-life", canvasWrapper);
@@ -25,7 +25,7 @@ let startGame = gameConfig => {
        let tileWidth = canvasWidth /. float_of_int(gameConfig.columns);
        let tileHeight = canvasHeight /. float_of_int(gameConfig.rows);
 
-       Canvas.drawGrid(
+       CanvasUtils.drawGrid(
          ~canvasWidth,
          ~canvasHeight,
          ~tileWidth,
