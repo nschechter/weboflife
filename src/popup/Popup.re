@@ -1,18 +1,18 @@
-open Chrome;
-
 Misc.import("./Popup.scss");
 
 type action =
   | SetInterval(string)
   | SetRows(string)
   | SetColumns(string)
-  | SetRGBTolerance(string);
+  | SetRGBTolerance(string)
+  | SetAlive(string);
 
 type state = {
   interval: string,
   rows: string,
   columns: string,
   rgbTolerance: string,
+  alive: string,
 };
 
 [@react.component]
@@ -25,19 +25,38 @@ let make = () => {
         | SetRows(rows) => {...state, rows}
         | SetColumns(columns) => {...state, columns}
         | SetRGBTolerance(rgbTolerance) => {...state, rgbTolerance}
+        | SetAlive(aliveCount) => {...state, alive: aliveCount}
         },
-      {interval: "1000", rows: "10", columns: "10", rgbTolerance: "235"},
+      {
+        interval: "1000",
+        rows: "10",
+        columns: "10",
+        rgbTolerance: "235",
+        alive: "0",
+      },
     );
+
+  React.useEffect0(() => {
+    // Chrome.Runtime.connect({name: "aliveCount "})
+    // ->Chrome.Port.onMessageAddListener(newAliveCount =>
+    //     currentAlive := newAliveCount
+    //   );
+    Chrome.Runtime.onConnectAddListener(port =>
+      Chrome.Port.onMessageAddListener(port, msg => dispatch(SetAlive(msg)))
+    );
+    None;
+  });
 
   let handleStartGame =
     React.useCallback1(
       _ =>
-        query({currentWindow: Some(true), active: Some(true)}, tabs =>
+        Chrome.Tabs.query(
+          {currentWindow: Some(true), active: Some(true)}, tabs =>
           tabs[0].id
           |> (
             fun
             | Some(id) => {
-                sendMessage(
+                Chrome.Tabs.sendMessage(
                   id,
                   StartGame({
                     timeInterval: int_of_string(state.interval),
@@ -55,11 +74,12 @@ let make = () => {
 
   let handleEndGame =
     React.useCallback0(_ =>
-      query({currentWindow: Some(true), active: Some(true)}, tabs =>
+      Chrome.Tabs.query(
+        {currentWindow: Some(true), active: Some(true)}, tabs =>
         tabs[0].id
         |> (
           fun
-          | Some(id) => sendMessage(id, StopGame)
+          | Some(id) => Chrome.Tabs.sendMessage(id, StopGame)
           | None => ()
         )
       )
@@ -140,5 +160,6 @@ let make = () => {
       min=0
       max="255"
     />
+    <span> {React.string(state.alive)} </span>
   </div>;
 };

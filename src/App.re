@@ -1,13 +1,12 @@
 open Webapi.Dom;
 open Webapi.Canvas;
-open Chrome;
 
 [@bs.val] external document: Dom.document = "document";
 [@bs.val] external body: Dom.element = "document.body";
 
 let options = Some(HTML2Canvas.options(~allowTaint=false, ()));
 
-let startGame = gameConfig => {
+let startGame = (gameConfig: Chrome.gameConfig) => {
   let canvasWrapper = document |> Document.createElement("div");
 
   HTML2Canvas.make(body, options)
@@ -48,7 +47,10 @@ let stopGame = () => {
   Game.stopGame();
 };
 
-onMessageAddListener(message => {
+// For debugging locally using index.html
+// startGame({timeInterval: 10, rows: 100, columns: 100, rgbTolerance: 235});
+
+Chrome.Runtime.onMessageAddListener(message => {
   switch (message) {
   | StartGame(gameConfig) => startGame(gameConfig)
   | StopGame => stopGame()
