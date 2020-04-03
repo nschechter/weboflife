@@ -207,7 +207,7 @@ let nextGeneration =
     } else {
       let amtAliveInRow =
         traverseRows(
-          ~aliveCount=0,
+          ~aliveCount,
           ~currY,
           ~currX=0,
           ~maxCols=gameConfig.columns,
@@ -271,7 +271,7 @@ let createGeneration =
     } else {
       let amtAliveInRow =
         traverseRows(
-          ~aliveCount=0,
+          ~aliveCount,
           ~currY,
           ~currX=0,
           ~maxCols=gameConfig.columns,
@@ -286,11 +286,16 @@ let createGeneration =
   traverseColumns(~aliveCount=0, ~currY=0, ~maxRows=gameConfig.columns);
 };
 
+let stopGame = () => {
+  isGameRunning := false;
+};
+
 let make = (~gameConfig: Chrome.gameConfig, ~tileWidth, ~tileHeight, canvas) => {
   let timeoutId = ref(None);
+  let port = Chrome.Runtime.connect({name: "aliveCount"});
 
   let rec loop = currentGen =>
-    if (! isGameRunning^) {
+    if (currentGen.currentAlive == 0 || ! isGameRunning^) {
       switch (timeoutId^) {
       | Some(id) => Js.Global.clearTimeout(id)
       | None => ignore()
@@ -300,6 +305,8 @@ let make = (~gameConfig: Chrome.gameConfig, ~tileWidth, ~tileHeight, canvas) => 
         currentGen
         |> nextGeneration(~gameConfig, ~canvas, ~tileWidth, ~tileHeight);
 
+      Chrome.Port.postMessage(port, string_of_int(nextGen.currentAlive));
+
       timeoutId :=
         Some(
           Js.Global.setTimeout(_ => loop(nextGen), gameConfig.timeInterval),
@@ -308,8 +315,4 @@ let make = (~gameConfig: Chrome.gameConfig, ~tileWidth, ~tileHeight, canvas) => 
 
   isGameRunning := true;
   createGeneration(~gameConfig, ~tileWidth, ~tileHeight, ~canvas) |> loop;
-};
-
-let stopGame = () => {
-  isGameRunning := false;
 };
