@@ -26,16 +26,16 @@ let drawColumns = (~canvasWidth, ~canvasHeight, ~tileWidth, context) => {
   aux(~currentWidth=0.0);
 };
 
-let isCellAlive = dataArr => {
+let isCellAlive = (~rgbTolerance, dataArr) => {
   open Js.Typed_array.Uint8ClampedArray;
   let rec aux = (~currIndex, ~darkPixels, ~lightPixels) =>
     if (currIndex + 4 >= length(dataArr)) {
       darkPixels > lightPixels;
     } else {
       switch (
-        unsafe_get(dataArr, currIndex) > 235,
-        unsafe_get(dataArr, currIndex + 1) > 235,
-        unsafe_get(dataArr, currIndex + 2) > 235,
+        unsafe_get(dataArr, currIndex) > rgbTolerance,
+        unsafe_get(dataArr, currIndex + 1) > rgbTolerance,
+        unsafe_get(dataArr, currIndex + 2) > rgbTolerance,
       ) {
       | (true, true, true)
       | (true, true, false)

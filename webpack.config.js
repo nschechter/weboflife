@@ -7,23 +7,27 @@ module.exports = {
     popup: "./src/popup/Index.bs.js"
   },
   output: {
-    path: path.join(__dirname, 'dist'),
-    filename: '[name].bundle.js',
+    path: path.join(__dirname, "dist"),
+    filename: "[name].bundle.js"
   },
   module: {
     rules: [
       {
         test: /\.bs.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ["babel-loader"]
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: ["style-loader", "css-loader", "sass-loader"]
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.bs.js']
+    extensions: [".js", ".bs.js"]
   },
   stats: {
     colors: true
   },
-  devtool: 'source-map'
+  devtool: "source-map"
 };
