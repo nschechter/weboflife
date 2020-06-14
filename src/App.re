@@ -47,7 +47,7 @@ let stopGame = () => {
   Game.stopGame();
 };
 
-// For debugging locally using index.html
+// For debugging locally using index.html. Make sure to disable Chrome.* usage in other files
 // startGame({timeInterval: 10, rows: 100, columns: 100, rgbTolerance: 235});
 
 Chrome.Runtime.onMessageAddListener(message => {
