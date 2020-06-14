@@ -24,13 +24,15 @@ let startGame = (gameConfig: Chrome.gameConfig) => {
        let tileWidth = canvasWidth /. float_of_int(gameConfig.columns);
        let tileHeight = canvasHeight /. float_of_int(gameConfig.rows);
 
-       CanvasUtils.drawGrid(
-         ~canvasWidth,
-         ~canvasHeight,
-         ~tileWidth,
-         ~tileHeight,
-         c,
-       );
+       gameConfig.showGrid
+         ? CanvasUtils.drawGrid(
+             ~canvasWidth,
+             ~canvasHeight,
+             ~tileWidth,
+             ~tileHeight,
+             c,
+           )
+         : ignore();
 
        c
        |> Game.make(~gameConfig, ~tileWidth, ~tileHeight)

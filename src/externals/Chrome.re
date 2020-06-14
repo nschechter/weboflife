@@ -13,6 +13,7 @@ type gameConfig = {
   rows: int,
   columns: int,
   rgbTolerance: int,
+  showGrid: bool,
 };
 
 type executeScriptOptions = {file: string};

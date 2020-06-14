@@ -5,7 +5,8 @@ type action =
   | SetRows(string)
   | SetColumns(string)
   | SetRGBTolerance(string)
-  | SetAlive(string);
+  | SetAlive(string)
+  | SetShowGrid(bool);
 
 type state = {
   interval: string,
@@ -13,6 +14,7 @@ type state = {
   columns: string,
   rgbTolerance: string,
   alive: string,
+  showGrid: bool,
 };
 
 [@react.component]
@@ -26,6 +28,7 @@ let make = () => {
         | SetColumns(columns) => {...state, columns}
         | SetRGBTolerance(rgbTolerance) => {...state, rgbTolerance}
         | SetAlive(aliveCount) => {...state, alive: aliveCount}
+        | SetShowGrid(val_) => {...state, showGrid: val_}
         },
       {
         interval: "1000",
@@ -33,14 +36,11 @@ let make = () => {
         columns: "10",
         rgbTolerance: "235",
         alive: "0",
+        showGrid: false,
       },
     );
 
   React.useEffect0(() => {
-    // Chrome.Runtime.connect({name: "aliveCount "})
-    // ->Chrome.Port.onMessageAddListener(newAliveCount =>
-    //     currentAlive := newAliveCount
-    //   );
     Chrome.Runtime.onConnectAddListener(port =>
       Chrome.Port.onMessageAddListener(port, msg => dispatch(SetAlive(msg)))
     );
@@ -63,6 +63,7 @@ let make = () => {
                     rows: int_of_string(state.rows),
                     columns: int_of_string(state.columns),
                     rgbTolerance: int_of_string(state.rgbTolerance),
+                    showGrid: state.showGrid,
                   }),
                 );
               }
@@ -108,6 +109,12 @@ let make = () => {
       event =>
         dispatch(SetRGBTolerance(ReactEvent.Form.target(event)##value)),
       [|state.rgbTolerance|],
+    );
+
+  let handleChangeShowGrid =
+    React.useCallback1(
+      event => dispatch(SetShowGrid(ReactEvent.Form.target(event)##value)),
+      [|state.showGrid|],
     );
 
   <div className="Popup">
@@ -159,6 +166,14 @@ let make = () => {
       onChange=handleChangeRGBTolerance
       min=0
       max="255"
+    />
+    <label htmlFor="showgrid"> {React.string("Show Grid")} </label>
+    <input
+      className="Popup__input"
+      type_="checkbox"
+      id="showgrid"
+      checked={state.showGrid}
+      onChange=handleChangeShowGrid
     />
     <span> {React.string(state.alive)} </span>
   </div>;
