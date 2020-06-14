@@ -33,7 +33,7 @@ let isInBounds = (~gameConfig: Chrome.gameConfig, ~x, ~y) => {
   x >= 0 && y >= 0 && x <= xMax && y <= yMax;
 };
 
-let nextGen2 =
+let nextGeneration =
     (
       ~gameConfig: Chrome.gameConfig,
       ~tileWidth,
@@ -191,7 +191,8 @@ let make = (~gameConfig: Chrome.gameConfig, ~tileWidth, ~tileHeight, canvas) => 
       };
     } else {
       let nextGen =
-        currentGen |> nextGen2(~gameConfig, ~canvas, ~tileWidth, ~tileHeight);
+        currentGen
+        |> nextGeneration(~gameConfig, ~canvas, ~tileWidth, ~tileHeight);
 
       Chrome.Port.postMessage(port, string_of_int(nextGen.currentAlive));
 
