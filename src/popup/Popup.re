@@ -36,7 +36,7 @@ let make = () => {
         columns: "10",
         rgbTolerance: "235",
         alive: "0",
-        showGrid: false,
+        showGrid: true,
       },
     );
 
@@ -113,7 +113,8 @@ let make = () => {
 
   let handleChangeShowGrid =
     React.useCallback1(
-      event => dispatch(SetShowGrid(ReactEvent.Form.target(event)##value)),
+      event =>
+        dispatch(SetShowGrid(ReactEvent.Form.target(event)##checked)),
       [|state.showGrid|],
     );
 
@@ -175,6 +176,6 @@ let make = () => {
       checked={state.showGrid}
       onChange=handleChangeShowGrid
     />
-    <span> {React.string(state.alive)} </span>
+    <div> {React.string(state.alive)} </div>
   </div>;
 };
