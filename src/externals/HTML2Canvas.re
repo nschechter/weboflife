@@ -6,6 +6,14 @@ type options = {
   proxy: string,
   [@bs.optional]
   useCORS: bool,
+  [@bs.optional]
+  width: int,
+  [@bs.optional]
+  height: int,
+  [@bs.optional]
+  x: int,
+  [@bs.optional]
+  y: int,
 };
 
 [@bs.module]
