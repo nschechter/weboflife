@@ -10,7 +10,7 @@
     "build:watch": "yarn bsb -make-world -w",
     "build:prod": "yarn bsb -make-world && webpack --config webpack.config.js",
     "clean": "yarn bsb -clean-world",
-    "package": "yarn bestzip extension.zip dist/* assets/* manifest.json",
+    "package": "yarn bestzip extension.zip dist/*.js dist/popup.html assets/* manifest.json",
     "prepare": "yarn clean && yarn build:prod && yarn test",
     "release": "yarn prepare && yarn package",
     "test": "yarn jest"
