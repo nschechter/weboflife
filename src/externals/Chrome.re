@@ -35,12 +35,20 @@ module Port = {
 
 module Runtime = {
   [@bs.val]
+  external onMessageAddListenerStatus: (string => unit) => unit =
+    "chrome.runtime.onMessage.addListener";
+
+  [@bs.val]
   external onMessageAddListener: (message => unit) => unit =
     "chrome.runtime.onMessage.addListener";
 
   [@bs.val]
   external onConnectAddListener: (Port.t => unit) => unit =
     "chrome.runtime.onConnect.addListener";
+
+  [@bs.val]
+  external sendMessage: (Js.Dict.t(string), string => unit) => unit =
+    "chrome.runtime.sendMessage";
 
   [@bs.val]
   external connect: Port.connectOptions => Port.t = "chrome.runtime.connect";
@@ -58,4 +66,17 @@ module Tabs = {
   external executeScript:
     (Js.Nullable.t(int), executeScriptOptions, unit => unit) => unit =
     "chrome.tabs.executeScript";
+};
+
+module Storage = {
+  [@bs.val]
+  external set: Js.Dict.t(string) => unit = "chrome.storage.local.set";
+
+  [@bs.val]
+  external get: (Js.Dict.t(string), array(Js.Dict.t(string)) => unit) =
+    "chrome.storage.local.get";
+
+  [@bs.val]
+  external addListener: (string => unit) => unit =
+    "chrome.storage.onChanged.addListener";
 };

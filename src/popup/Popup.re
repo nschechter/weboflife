@@ -6,6 +6,7 @@ type action =
   | SetColumns(string)
   | SetRGBTolerance(string)
   | SetAlive(string)
+  | SetStatus(string)
   | SetShowGrid(bool);
 
 type state = {
@@ -14,6 +15,7 @@ type state = {
   columns: string,
   rgbTolerance: string,
   alive: string,
+  status: string,
   showGrid: bool,
 };
 
@@ -28,6 +30,7 @@ let make = () => {
         | SetColumns(columns) => {...state, columns}
         | SetRGBTolerance(rgbTolerance) => {...state, rgbTolerance}
         | SetAlive(aliveCount) => {...state, alive: aliveCount}
+        | SetStatus(status) => {...state, status}
         | SetShowGrid(val_) => {...state, showGrid: val_}
         },
       {
@@ -36,11 +39,13 @@ let make = () => {
         columns: "10",
         rgbTolerance: "235",
         alive: "0",
+        status: "",
         showGrid: true,
       },
     );
 
   React.useEffect0(() => {
+    Chrome.Storage.addListener(msg => Js.log(msg));
     Chrome.Runtime.onConnectAddListener(port =>
       Chrome.Port.onMessageAddListener(port, msg => dispatch(SetAlive(msg)))
     );
@@ -127,6 +132,7 @@ let make = () => {
         {React.string("Stop")}
       </button>
     </div>
+    <div> {React.string(state.status)} </div>
     <label htmlFor="Interval"> {React.string("Interval")} </label>
     <input
       className="Popup__input"

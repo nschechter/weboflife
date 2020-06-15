@@ -3,8 +3,30 @@ open Webapi.Canvas;
 
 [@bs.val] external document: Dom.document = "document";
 [@bs.val] external body: Dom.element = "document.body";
+[@bs.val] external innerHeight: int = "innerHeight";
+[@bs.val] external innerWidth: int = "innerWidth";
+[@bs.val] external pageYOffset: int = "pageYOffset";
+[@bs.val] external pageXOffset: int = "pageXOffset";
 
-let options = Some(HTML2Canvas.options(~allowTaint=false, ()));
+let options =
+  Some(
+    HTML2Canvas.options(
+      ~allowTaint=false,
+      ~width=innerWidth,
+      ~height=innerHeight,
+      ~x=pageXOffset,
+      ~y=pageYOffset,
+      (),
+    ),
+  );
+
+let stopGame = () => {
+  switch (Document.querySelector("#web-of-life", document)) {
+  | Some(element) => body |> Element.removeChild(element) |> ignore
+  | None => ()
+  };
+  Game.stopGame();
+};
 
 let startGame = (gameConfig: Chrome.gameConfig) => {
   let canvasWrapper = document |> Document.createElement("div");
@@ -24,29 +46,28 @@ let startGame = (gameConfig: Chrome.gameConfig) => {
        let tileWidth = canvasWidth /. float_of_int(gameConfig.columns);
        let tileHeight = canvasHeight /. float_of_int(gameConfig.rows);
 
-       gameConfig.showGrid
-         ? CanvasUtils.drawGrid(
-             ~canvasWidth,
-             ~canvasHeight,
-             ~tileWidth,
-             ~tileHeight,
-             c,
-           )
-         : ignore();
+       if (tileWidth >= 2.0 && tileHeight >= 2.0) {
+         gameConfig.showGrid
+           ? CanvasUtils.drawGrid(
+               ~canvasWidth,
+               ~canvasHeight,
+               ~tileWidth,
+               ~tileHeight,
+               c,
+             )
+           : ignore();
 
-       c
-       |> Game.make(~gameConfig, ~tileWidth, ~tileHeight)
-       |> Js.Promise.resolve;
+         c
+         |> Game.make(~gameConfig, ~tileWidth, ~tileHeight)
+         |> Js.Promise.resolve;
+       } else {
+         stopGame();
+         let message = Js.Dict.empty();
+         Js.Dict.set(message, "status", "The grid is too big!");
+         Chrome.Storage.set(message) |> Js.Promise.resolve;
+       };
      })
   |> ignore;
-};
-
-let stopGame = () => {
-  switch (Document.querySelector("#web-of-life", document)) {
-  | Some(element) => body |> Element.removeChild(element) |> ignore
-  | None => ()
-  };
-  Game.stopGame();
 };
 
 // For debugging locally using index.html. Make sure to disable Chrome.* usage in other files

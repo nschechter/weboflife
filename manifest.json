@@ -3,7 +3,7 @@
   "version": "0.5",
   "manifest_version": 2,
   "description": "Make your webpage alive!",
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
   "icons": {
     "16": "assets/icon16.png"
   },
